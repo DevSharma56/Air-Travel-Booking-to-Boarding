@@ -1,0 +1,122 @@
+import java.util.*;
+
+// User roles enumeration
+enum UserRole {
+    ADMIN, STAFF, CUSTOMER
+}
+
+// System User class
+class User {
+    private String username;
+    private UserRole role;
+
+    public User(String username, UserRole role) {
+        this.username = username;
+        this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+}
+
+// Flight class representing flight data
+class Flight {
+    private String flightNumber;
+    private String origin;
+    private String destination;
+    private String status;
+
+    public Flight(String flightNumber, String origin, String destination, String status) {
+        this.flightNumber = flightNumber;
+        this.origin = origin;
+        this.destination = destination;
+        this.status = status;
+    }
+
+    public String getFlightNumber() {
+        return flightNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void updateStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Flight " + flightNumber + " from " + origin + " to " + destination + " is " + status;
+    }
+}
+
+// System Administration Interface
+class SystemAdmin {
+    private List<User> users = new ArrayList<>();
+    private List<Flight> flights = new ArrayList<>();
+
+    public void addUser(String username, UserRole role) {
+        users.add(new User(username, role));
+    }
+
+    public void addFlight(String flightNumber, String origin, String destination, String status) {
+        flights.add(new Flight(flightNumber, origin, destination, status));
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public List<Flight> getFlights() {
+        return flights;
+    }
+}
+
+// Flight Operations & Control Dashboard
+class FlightControlDashboard {
+    private List<Flight> flights;
+
+    public FlightControlDashboard(List<Flight> flights) {
+        this.flights = flights;
+    }
+
+    public void updateFlightStatus(String flightNumber, String newStatus) {
+        for (Flight flight : flights) {
+            if (flight.getFlightNumber().equals(flightNumber)) {
+                flight.updateStatus(newStatus);
+                System.out.println("Updated: " + flight);
+                return;
+            }
+        }
+        System.out.println("Flight not found.");
+    }
+
+    public void displayFlights() {
+        for (Flight flight : flights) {
+            System.out.println(flight);
+        }
+    }
+}
+
+// Main Class to demonstrate functionality
+public class AirlineManagementSystem {
+    public static void main(String[] args) {
+        SystemAdmin admin = new SystemAdmin();
+        admin.addUser("admin1", UserRole.ADMIN);
+        admin.addUser("staff1", UserRole.STAFF);
+        admin.addFlight("AI101", "New York", "London", "Scheduled");
+        admin.addFlight("BA202", "Los Angeles", "Tokyo", "Delayed");
+        
+        FlightControlDashboard dashboard = new FlightControlDashboard(admin.getFlights());
+        dashboard.displayFlights();
+        
+        dashboard.updateFlightStatus("AI101", "Departed");
+        dashboard.displayFlights();
+    }
+}
