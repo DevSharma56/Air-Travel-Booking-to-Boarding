@@ -1,6 +1,5 @@
 import java.util.*;
 
-// Passenger class representing a traveler
 class Passenger {
     private String passengerId;
     private String name;
@@ -16,18 +15,9 @@ class Passenger {
         this.seatNumber = "Not Assigned";
     }
 
-    public String getBookingReference() {
-        return bookingReference;
-    }
-
-    public boolean isCheckedIn() {
-        return checkedIn;
-    }
-
-    public String getSeatNumber() {
-        return seatNumber;
-    }
-
+    public String getBookingReference() { return bookingReference; }
+    public boolean isCheckedIn() { return checkedIn; }
+    public String getSeatNumber() { return seatNumber; }
     public void checkIn(String seatNumber) {
         this.checkedIn = true;
         this.seatNumber = seatNumber;
@@ -41,7 +31,6 @@ class Passenger {
     }
 }
 
-// AirlineDatabase class simulating a flight database
 class AirlineDatabase {
     private Map<String, Passenger> passengerRecords;
 
@@ -58,14 +47,13 @@ class AirlineDatabase {
     }
 }
 
-// CheckInSystem class for handling passenger check-in
 class CheckInSystem {
     private AirlineDatabase airlineDatabase;
     private List<String> availableSeats;
 
     public CheckInSystem(AirlineDatabase airlineDatabase) {
         this.airlineDatabase = airlineDatabase;
-        this.availableSeats = new ArrayList<>(Arrays.asList("1A", "1B", "2A", "2B", "3A", "3B")); // Dummy seat data
+        this.availableSeats = new ArrayList<>(Arrays.asList("1A", "1B", "2A", "2B", "3A", "3B"));
     }
 
     public void checkInPassenger(String bookingReference) {
@@ -78,17 +66,14 @@ class CheckInSystem {
             System.out.println("Passenger already checked in.");
             return;
         }
-
         System.out.println("Available Seats: " + availableSeats);
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter seat number to select: ");
         String chosenSeat = scanner.nextLine();
-
         if (!availableSeats.contains(chosenSeat)) {
             System.out.println("Invalid Seat Selection! Try Again.");
             return;
         }
-
         passenger.checkIn(chosenSeat);
         availableSeats.remove(chosenSeat);
         System.out.println("Check-in Successful! Boarding Pass Generated.\n");
@@ -96,25 +81,32 @@ class CheckInSystem {
     }
 }
 
-// Main class to simulate check-in flow
 public class AirTravelCheckIn {
     public static void main(String[] args) {
         AirlineDatabase database = new AirlineDatabase();
-
-        // Adding sample passengers
-        Passenger p1 = new Passenger("P001", "Md Aadil Hasan", "BR123");
-        Passenger p2 = new Passenger("P002", "Dev Sharma", "BR456");
-
-        database.addPassenger(p1);
-        database.addPassenger(p2);
-
+        database.addPassenger(new Passenger("P001", "Adil Hasan", "BR123"));
+        database.addPassenger(new Passenger("P002", "Dev Sharma", "BR456"));
         CheckInSystem checkInSystem = new CheckInSystem(database);
 
-        // Simulating passenger check-in
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter Booking Reference for Check-in: ");
-        String bookingRef = scanner.nextLine();
+        while (true) {
+            System.out.println("\n==== CHECK-IN SYSTEM ====");
+            System.out.println("1. Check-in Passenger");
+            System.out.println("2. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
 
-        checkInSystem.checkInPassenger(bookingRef);
+            if (choice == 1) {
+                System.out.print("Enter Booking Reference for Check-in: ");
+                String bookingRef = scanner.nextLine();
+                checkInSystem.checkInPassenger(bookingRef);
+            } else if (choice == 2) {
+                System.out.println("Exiting system. Goodbye!");
+                break;
+            } else {
+                System.out.println("Invalid choice.");
+            }
+        }
     }
 }
