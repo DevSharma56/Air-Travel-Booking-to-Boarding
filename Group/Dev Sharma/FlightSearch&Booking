@@ -30,11 +30,9 @@ class Flight {
     public String getFlightId() { return flightId; }
     public String getOrigin() { return origin; }
     public String getDestination() { return destination; }
-    public LocalDateTime getDepartureTime() { return departureTime; }
     public double getPrice() { return price; }
     public int getAvailableSeats() { return availableSeats; }
     public void bookSeats(int seats) { if (seats <= availableSeats) availableSeats -= seats; }
-    public void cancelSeats(int seats) { if (seats > 0) availableSeats += seats; }
 
     @Override
     public String toString() {
@@ -60,9 +58,6 @@ class Booking {
         this.totalPrice = totalPrice;
     }
 
-    public String getBookingId() { return bookingId; }
-    public String getFlightId() { return flightId; }
-
     @Override
     public String toString() {
         return "Booking ID: " + bookingId + "\n" +
@@ -78,17 +73,12 @@ class FlightSystem {
     private final Random random = new Random();
 
     public void addSampleFlights() {
-        for (int i = 1; i <= 10; i++) {
-            flights.put("F10" + i, new Flight("F10" + i, "Airline " + i, "CityA", "CityB",
-                    LocalDateTime.now().plusDays(i), LocalDateTime.now().plusDays(i).plusHours(3),
-                    200, 300 + (i * 50), 200));
-        }
-    }
-
-    public void addSampleBookings() {
-        for (int i = 1; i <= 10; i++) {
-            bookings.put("B10" + i, new Booking("B10" + i, "F10" + (i % 10 + 1), "Passenger " + i, i, (300 + (i * 50)) * i));
-        }
+        flights.put("F101", new Flight("F101", "Airline A", "CityA", "CityB",
+                LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1).plusHours(3),
+                200, 300, 200));
+        flights.put("F102", new Flight("F102", "Airline B", "CityA", "CityC",
+                LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(2).plusHours(4),
+                150, 250, 150));
     }
 
     public List<Flight> searchFlights(String origin, String destination) {
@@ -102,12 +92,17 @@ class FlightSystem {
         return results;
     }
 
-    public Flight getFlight(String flightId) {
-        return flights.get(flightId);
-    }
-
-    public Booking getBooking(String bookingId) {
-        return bookings.get(bookingId);
+    public Booking bookFlight(String flightId, String passengerName, int seats) {
+        Flight flight = flights.get(flightId);
+        if (flight == null || seats > flight.getAvailableSeats()) {
+            System.out.println("Flight not found or insufficient seats.");
+            return null;
+        }
+        String bookingId = "B" + random.nextInt(10000);
+        Booking booking = new Booking(bookingId, flightId, passengerName, seats, seats * flight.getPrice());
+        flight.bookSeats(seats);
+        bookings.put(bookingId, booking);
+        return booking;
     }
 }
 
@@ -116,44 +111,42 @@ public class FlightBookingSystem {
         Scanner scanner = new Scanner(System.in);
         FlightSystem system = new FlightSystem();
         system.addSampleFlights();
-        system.addSampleBookings();
-        
+
         while (true) {
             System.out.println("\n==== FLIGHT SEARCH & BOOKING SYSTEM ====");
             System.out.println("1. Search Flights");
-            System.out.println("2. View Flight Details");
-            System.out.println("3. View Booking Details");
-            System.out.println("4. Exit");
+            System.out.println("2. Book Flight");
+            System.out.println("3. Exit");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
             switch (choice) {
-                case 1 -> {
+                case 1:
                     System.out.print("Enter origin city: ");
                     String origin = scanner.nextLine();
                     System.out.print("Enter destination city: ");
                     String destination = scanner.nextLine();
                     List<Flight> flights = system.searchFlights(origin, destination);
                     flights.forEach(System.out::println);
-                }
-                case 2 -> {
+                    break;
+                case 2:
                     System.out.print("Enter Flight ID: ");
                     String flightId = scanner.nextLine();
-                    Flight flight = system.getFlight(flightId);
-                    System.out.println(flight != null ? flight : "Flight not found.");
-                }
-                case 3 -> {
-                    System.out.print("Enter Booking ID: ");
-                    String bookingId = scanner.nextLine();
-                    Booking booking = system.getBooking(bookingId);
-                    System.out.println(booking != null ? booking : "Booking not found.");
-                }
-                case 4 -> {
+                    System.out.print("Enter Passenger Name: ");
+                    String passengerName = scanner.nextLine();
+                    System.out.print("Enter Number of Seats: ");
+                    int seats = scanner.nextInt();
+                    scanner.nextLine();
+                    Booking booking = system.bookFlight(flightId, passengerName, seats);
+                    if (booking != null) System.out.println(booking);
+                    break;
+                case 3:
                     System.out.println("Exiting system. Goodbye!");
                     scanner.close();
                     return;
-                }
+                default:
+                    System.out.println("Invalid choice.");
             }
         }
     }
