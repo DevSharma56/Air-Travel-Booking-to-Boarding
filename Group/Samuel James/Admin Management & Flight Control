@@ -1,11 +1,9 @@
 import java.util.*;
 
-// User roles enumeration
 enum UserRole {
     ADMIN, STAFF, CUSTOMER
 }
 
-// System User class
 class User {
     private String username;
     private UserRole role;
@@ -14,17 +12,8 @@ class User {
         this.username = username;
         this.role = role;
     }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
 }
 
-// Flight class representing flight data
 class Flight {
     private String flightNumber;
     private String origin;
@@ -38,17 +27,8 @@ class Flight {
         this.status = status;
     }
 
-    public String getFlightNumber() {
-        return flightNumber;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void updateStatus(String status) {
-        this.status = status;
-    }
+    public String getFlightNumber() { return flightNumber; }
+    public void updateStatus(String status) { this.status = status; }
 
     @Override
     public String toString() {
@@ -56,7 +36,6 @@ class Flight {
     }
 }
 
-// System Administration Interface
 class SystemAdmin {
     private List<User> users = new ArrayList<>();
     private List<Flight> flights = new ArrayList<>();
@@ -69,16 +48,9 @@ class SystemAdmin {
         flights.add(new Flight(flightNumber, origin, destination, status));
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public List<Flight> getFlights() {
-        return flights;
-    }
+    public List<Flight> getFlights() { return flights; }
 }
 
-// Flight Operations & Control Dashboard
 class FlightControlDashboard {
     private List<Flight> flights;
 
@@ -104,19 +76,42 @@ class FlightControlDashboard {
     }
 }
 
-// Main Class to demonstrate functionality
 public class AirlineManagementSystem {
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
         SystemAdmin admin = new SystemAdmin();
         admin.addUser("admin1", UserRole.ADMIN);
-        admin.addUser("staff1", UserRole.STAFF);
         admin.addFlight("AI101", "New York", "London", "Scheduled");
         admin.addFlight("BA202", "Los Angeles", "Tokyo", "Delayed");
-        
         FlightControlDashboard dashboard = new FlightControlDashboard(admin.getFlights());
-        dashboard.displayFlights();
-        
-        dashboard.updateFlightStatus("AI101", "Departed");
-        dashboard.displayFlights();
+
+        while (true) {
+            System.out.println("\n==== ADMIN MANAGEMENT SYSTEM ====");
+            System.out.println("1. Display Flights");
+            System.out.println("2. Update Flight Status");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    dashboard.displayFlights();
+                    break;
+                case 2:
+                    System.out.print("Enter Flight Number: ");
+                    String flightNumber = scanner.nextLine();
+                    System.out.print("Enter New Status: ");
+                    String newStatus = scanner.nextLine();
+                    dashboard.updateFlightStatus(flightNumber, newStatus);
+                    break;
+                case 3:
+                    System.out.println("Exiting system. Goodbye!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
     }
 }
