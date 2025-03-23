@@ -1,6 +1,5 @@
 import java.util.*;
 
-// Abstract class for Payment Gateway
 abstract class PaymentGateway {
     protected String gatewayName;
 
@@ -12,7 +11,6 @@ abstract class PaymentGateway {
     public abstract boolean refundPayment(String transactionId, double amount);
 }
 
-// Concrete class for Stripe Payment Gateway
 class StripeGateway extends PaymentGateway {
     public StripeGateway() {
         super("Stripe");
@@ -31,7 +29,6 @@ class StripeGateway extends PaymentGateway {
     }
 }
 
-// Concrete class for PayPal Payment Gateway
 class PayPalGateway extends PaymentGateway {
     public PayPalGateway() {
         super("PayPal");
@@ -50,7 +47,6 @@ class PayPalGateway extends PaymentGateway {
     }
 }
 
-// Transaction class to store payment details
 class Transaction {
     private String transactionId;
     private double amount;
@@ -62,21 +58,10 @@ class Transaction {
         this.status = "Success";
     }
 
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getTransactionId() { return transactionId; }
+    public double getAmount() { return amount; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public void printReceipt() {
         System.out.println("\n🧾 Payment Receipt");
@@ -88,7 +73,6 @@ class Transaction {
     }
 }
 
-// Payment Processor Class
 class PaymentProcessor {
     private PaymentGateway paymentGateway;
     private List<Transaction> transactions;
@@ -101,7 +85,6 @@ class PaymentProcessor {
     public String makePayment(double amount) {
         String transactionId = "TXN" + System.currentTimeMillis();
         Transaction transaction = new Transaction(transactionId, amount);
-        
         if (paymentGateway.processPayment(amount, transactionId)) {
             transactions.add(transaction);
             transaction.printReceipt();
@@ -111,23 +94,8 @@ class PaymentProcessor {
         }
         return transactionId;
     }
-
-    public boolean processRefund(String transactionId) {
-        for (Transaction txn : transactions) {
-            if (txn.getTransactionId().equals(transactionId) && txn.getStatus().equals("Success")) {
-                if (paymentGateway.refundPayment(transactionId, txn.getAmount())) {
-                    txn.setStatus("Refunded");
-                    System.out.println("✅ Refund Successful for Transaction ID: " + transactionId);
-                    return true;
-                }
-            }
-        }
-        System.out.println("❌ Refund Failed. Transaction not found or already refunded.");
-        return false;
-    }
 }
 
-// Main class to simulate a real payment
 public class PaymentSimulation {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -138,34 +106,13 @@ public class PaymentSimulation {
         System.out.print("Enter choice (1/2): ");
         int choice = scanner.nextInt();
 
-        PaymentGateway selectedGateway;
-        if (choice == 1) {
-            selectedGateway = new StripeGateway();
-        } else if (choice == 2) {
-            selectedGateway = new PayPalGateway();
-        } else {
-            System.out.println("❌ Invalid choice! Exiting...");
-            return;
-        }
-
+        PaymentGateway selectedGateway = (choice == 1) ? new StripeGateway() : new PayPalGateway();
         PaymentProcessor paymentProcessor = new PaymentProcessor(selectedGateway);
 
         System.out.print("\n💵 Enter Amount to Pay: $");
         double amount = scanner.nextDouble();
-
-        String transactionId = paymentProcessor.makePayment(amount);
-
-        // Ask if user wants a refund
-        System.out.print("\n🔄 Do you want a refund? (yes/no): ");
-        String refundChoice = scanner.next();
-
-        if (refundChoice.equalsIgnoreCase("yes")) {
-            paymentProcessor.processRefund(transactionId);
-        } else {
-            System.out.println("✅ Thank you for your payment!");
-        }
+        paymentProcessor.makePayment(amount);
 
         scanner.close();
     }
 }
-
